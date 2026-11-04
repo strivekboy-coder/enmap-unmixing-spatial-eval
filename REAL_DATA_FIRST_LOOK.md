@@ -37,13 +37,16 @@ normalization, tuning or sum-to-one is applied. All 12 rebuilt EnMAP estimators
 exactly reproduce saved Stage A predictions. The extra S2-like branch is a
 sensitivity: one estimator differs at 2/71,158 replay pixels (maximum 0.009905).
 Ensemble SD is across 3 runs, not calibrated uncertainty; nominal georeferencing
-may contribute to apparent errors. AROSICS/actual-S2 checks are not yet completed.
+may contribute to historical differences.
+
+**Actual-S2 check:** Sentinel-2C 2025-05-12 (+1 day), scene cloud 8.00%. AROSICS 1.14.0 accepted 1 independent-mask 64x64 window (reliability 68.95%, an internal score). Correction to add to EnMAP origin: east +4.85 m, north -7.39 m. This is a local estimate, not scene-wide accuracy; RF results remain unshifted. Original ESA XML and red/NIR/SWIR JP2 comparisons (59,755 pixels/band) establish that S2 COG DN already includes -1000 DN: effective reflectance offset is 0, avoiding double subtraction. No EnMAP-based radiometric fitting.
 
 Raw files, model objects, detailed tables and fraction/uncertainty GeoTIFFs remain
 local under ignored `data/real_enmap/20250511/`. Only code/configuration, this report
 and two figures are published. Credentials are local and never logged. Deadline:
 **2026-11-04 15:30 Europe/Berlin**. Re-run with `python real_enmap.py --stage metadata`,
 `--stage download`, `--stage quality`, `--stage spectra`, `--stage transfer`.
+Optional order: `--stage optional-prepare`, `optional-audit`, `optional-coreg`, `optional-compare`.
 
 [DLR scene metadata](https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/ENMAP01-____L2A-DT0000129412_20250511T104201Z_009_V010502_20250515T040235Z) ·
 [Quality codes: product specification section 4.5](https://www.enmap.org/data/doc/EN-PCV-ICD-2009-2_HSI_Product_Specification_Level1_Level2.pdf).

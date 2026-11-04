@@ -39,3 +39,7 @@ optional_cross_mission:
   enabled_after_required_steps: true
   sentinel_date_tolerance_days: 3
   minimum_remaining_minutes: 20
+  selected_s2_item: S2C_33UUU_20250512_0_L2A
+  coreg_window_pixels: 64
+  coreg_max_shift_pixels: 5
+  coreg_min_reliability_percent: 60

@@ -441,13 +441,15 @@ def transfer_stage(cfg, root, deadline):
     return result
 
 
-def refresh_report(cfg, root):
+def refresh_report(cfg, root, include_cross_mission=True):
     raw = root / cfg['raw_directory']
     def read(name):
         path = raw / name
         return json.loads(path.read_text(encoding='utf-8')) if path.exists() else None
     meta, quality, spectra, transfer = [read(name) for name in
         ('metadata_summary.json', 'quality_summary.json', 'spectra_summary.json', 'transfer_summary.json')]
+    geometry = read('arosics_result.json')
+    cross = read('cross_mission_summary.json') if include_cross_mission else None
     angle = meta['angles_deg_by_corner']
     quality_note = 'Quality calculation pending.'
     if quality:
@@ -479,6 +481,24 @@ def refresh_report(cfg, root):
         metric_note += ('\n\nDominant-reference support (impervious/vegetation/soil/water): '
                         + '/'.join(str(transfer['historical_dominant_support'][name]) for name in ['impervious','vegetation','soil','water'])
                         + '; these 31 spatially sparse pixels cannot establish generalization.')
+    optional_note = 'Optional AROSICS/actual-S2 checks are not completed.'
+    if geometry and geometry.get('input_mask_rule','').startswith('Independent'):
+        reliable = [r for r in geometry['windows'] if r['accepted']]
+        optional_note = (f"**Actual-S2 check:** Sentinel-2C 2025-05-12 (+1 day), scene cloud 8.00%. "
+                         f"AROSICS {geometry['arosics_version']} accepted {len(reliable)} independent-mask 64x64 window "
+                         f"(reliability {reliable[0]['reliability_percent']:.2f}%, an internal score). "
+                         f"Correction to add to EnMAP origin: east {geometry['median_x_correction_m']:+.2f} m, "
+                         f"north {geometry['median_y_correction_m']:+.2f} m. This is a local estimate, not scene-wide accuracy; RF results remain unshifted.")
+        optional_note += (' Original ESA XML and red/NIR/SWIR JP2 comparisons (59,755 pixels/band) establish that '
+                          'S2 COG DN already includes -1000 DN: effective reflectance offset is 0, avoiding double subtraction. No EnMAP-based radiometric fitting.')
+    if cross:
+        primary=[r for r in cross['metrics'] if r['geometry']=='arosics']
+        optional_note += (f" Official S2C SRFs give 10 band comparisons, {min(r['n_pixels'] for r in primary):,}–"
+                          f"{max(r['n_pixels'] for r in primary):,} jointly qualified pairs/band: bias (EnMAP minus S2) "
+                          f"{min(r['bias_enmap_minus_actual_s2'] for r in primary):+.4f} to "
+                          f"{max(r['bias_enmap_minus_actual_s2'] for r in primary):+.4f}; RMSD "
+                          f"{min(r['rmsd'] for r in primary):.4f}–{max(r['rmsd'] for r in primary):.4f}. "
+                          'One-day, atmosphere, view/sun, PSF and resampling differences prevent calibration-validation claims.')
     figure_note = ''
     for name in ('spectra_quality.png', 'transfer_summary.png'):
         if (root / cfg['figure_directory'] / name).exists():
@@ -512,13 +532,16 @@ normalization, tuning or sum-to-one is applied. All 12 rebuilt EnMAP estimators
 exactly reproduce saved Stage A predictions. The extra S2-like branch is a
 sensitivity: one estimator differs at 2/71,158 replay pixels (maximum 0.009905).
 Ensemble SD is across 3 runs, not calibrated uncertainty; nominal georeferencing
-may contribute to apparent errors. AROSICS/actual-S2 checks are not yet completed.
+may contribute to historical differences.
+
+{optional_note}
 
 Raw files, model objects, detailed tables and fraction/uncertainty GeoTIFFs remain
 local under ignored `data/real_enmap/20250511/`. Only code/configuration, this report
 and two figures are published. Credentials are local and never logged. Deadline:
 **2026-11-04 15:30 Europe/Berlin**. Re-run with `python real_enmap.py --stage metadata`,
 `--stage download`, `--stage quality`, `--stage spectra`, `--stage transfer`.
+Optional order: `--stage optional-prepare`, `optional-audit`, `optional-coreg`, `optional-compare`.
 
 [DLR scene metadata](https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/{cfg['scene_id']}) ·
 [Quality codes: product specification section 4.5](https://www.enmap.org/data/doc/EN-PCV-ICD-2009-2_HSI_Product_Specification_Level1_Level2.pdf).

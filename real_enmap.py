@@ -136,7 +136,7 @@ def download_inputs(cfg, root, deadline):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', default='real_enmap_config.yaml')
-    parser.add_argument('--stage', choices=['metadata', 'download', 'prepare-models', 'quality', 'spectra', 'transfer'], required=True)
+    parser.add_argument('--stage', choices=['metadata', 'download', 'prepare-models', 'quality', 'spectra', 'transfer', 'optional-prepare', 'optional-audit', 'optional-coreg', 'optional-compare'], required=True)
     args = parser.parse_args()
     root = Path(__file__).resolve().parent
     cfg = yaml.safe_load((root / args.config).read_text(encoding='utf-8'))
@@ -150,6 +150,10 @@ def main():
         elif args.stage in ['quality', 'spectra', 'transfer']:
             from real_enmap_processing import quality_stage, spectra_stage, transfer_stage
             {'quality': quality_stage, 'spectra': spectra_stage, 'transfer': transfer_stage}[args.stage](cfg, root, deadline)
+        elif args.stage in ['optional-prepare', 'optional-audit', 'optional-coreg', 'optional-compare']:
+            from real_enmap_optional import prepare_s2, audit_s2_radiometry, run_coreg, compare_reflectance
+            {'optional-prepare': prepare_s2, 'optional-audit': audit_s2_radiometry, 'optional-coreg': run_coreg,
+             'optional-compare':compare_reflectance}[args.stage](cfg, root, deadline)
         else:
             prepare_models(cfg, root, deadline)
     except StopWork as exc:
