@@ -1,41 +1,39 @@
 # Real EnMAP first look — Berlin, 2025-05-11
 
-**Preliminary transfer experiment with a 16-year calendar gap:** real EnMAP (2025)
-versus the 2009 simulated scene/reference. Later differences include genuine land
-cover change, season, radiometry, geometry and model error; they cannot establish
-same-date accuracy.
+**16-year calendar gap:** 2025 real EnMAP versus the 2009 simulated scene/reference.
+These are historical discrepancies, combining model/sensor, geometry, season and
+genuine land-cover change; they do not establish same-date transfer accuracy.
 
-Scene: `DT0000129412`, tile `009`. XML was downloaded and parsed successfully.
+XML confirms centre acquisition **2025-05-11 10:42:03.869622 UTC**, processing-chain
+version **01.05.02**, 224 bands (418.416–2445.3 nm),
+viewing zenith **9.557 degrees**,
+viewing azimuth **103.265 degrees**,
+solar elevation/azimuth **55.329/171.341 degrees**.
+Reflectance is **DN x 0.0001 + 0**, applied exactly once; raw nodata is **-32768**.
+Land mode, bilinear, terrain correction, no cirrus/haze removal or band interpolation.
 
-| XML field | Measured metadata |
-| --- | --- |
-| Scene-centre acquisition | 2025-05-11 10:42:03.869622 UTC |
-| Processing-chain / archived L0 version | 01.05.02 / 01.05.02 |
-| Viewing zenith / azimuth | 9.556863 / 103.264674 degrees |
-| Sun elevation / azimuth | 55.328669 / 171.340563 degrees |
-| Spectral bands | 224; 418.416–2445.3 nm |
-| Reflectance conversion | DN x 0.0001 + 0, every band, applied once |
-| Raw invalid value | -32768 |
-| Processing | Land mode; bilinear; no cirrus/haze removal; no band interpolation |
+Atmospheric/testflag-clear nearest-grid share: 86.60%. **Conservative complete-feature inference support: 2,721/88,000 pixels (3.09% of the full tutorial rectangle; 3.06% of valid simulated-image support).** Historical reference overlap: 31 pixels. Reject cloud, cloud shadow, haze, any cirrus, snow, defective source bands and any quality-test flag; every bilinear contributor must pass. Individual flag shares overlap.
 
-**Progress:** step 1 complete. Quality layers have arrived; image download and
-steps 2–4 are underway. No tutorial-area clear fraction, real spectrum or transfer
-accuracy is claimed yet. Optional AROSICS/Sentinel-2 checks have not started.
+Spectrum comparison pending.
 
-Stage A estimator objects were not originally saved. All 12 reconstructed EnMAP
-estimators exactly reproduce the saved 2009 predictions. One reconstructed
-S2-like estimator differs at 2/71,158 simulated pixels (maximum fraction difference
-0.009905); that branch is marked sensitivity-only. No reference-based tuning occurs.
+Frozen RF inference and historical comparison pending.
 
-Raw downloads, XML, masks, model objects, numerical diagnostics and GeoTIFFs stay
-in ignored `data/real_enmap/20250511/`. Only code/configuration, up to two summary
-figures and this report are committed. Credentials are read locally, never logged.
-Geoservice authentication now uses the IPS main identity, as specified by DLR.
+Real spectra are bilinearly aligned to the exact tutorial grid and linearly
+interpolated to its frozen 177-band axis; no extrapolation or gaps >35 nm.
+At a gap boundary, nearest-band mapping is allowed only within half its FWHM and
+5 nm (1783 maps to 1780.22 nm); the gap itself is never bridged.
+This approximates differing spectral responses. No reference-fitted correction,
+normalization, tuning or sum-to-one is applied. All 12 rebuilt EnMAP estimators
+exactly reproduce saved Stage A predictions. The extra S2-like branch is a
+sensitivity: one estimator differs at 2/71,158 replay pixels (maximum 0.009905).
+Ensemble SD is across 3 runs, not calibrated uncertainty; nominal georeferencing
+may contribute to apparent errors. AROSICS/actual-S2 checks are not yet completed.
 
-Hard stop: **2026-11-04 15:30 Europe/Berlin**. Run
-`python real_enmap.py --stage metadata` then `--stage download` with
-`real_enmap_config.yaml`. Network work and model execution have deadline guards.
+Raw files, model objects, detailed tables and fraction/uncertainty GeoTIFFs remain
+local under ignored `data/real_enmap/20250511/`. Only code/configuration, this report
+and two figures are published. Credentials are local and never logged. Deadline:
+**2026-11-04 15:30 Europe/Berlin**. Re-run with `python real_enmap.py --stage metadata`,
+`--stage download`, `--stage quality`, `--stage spectra`, `--stage transfer`.
 
-Sources: [scene metadata](https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/ENMAP01-____L2A-DT0000129412_20250511T104201Z_009_V010502_20250515T040235Z),
-[product specification, quality codes in section 4.5](https://www.enmap.org/data/doc/EN-PCV-ICD-2009-2_HSI_Product_Specification_Level1_Level2.pdf),
-[DLR IPS identity guidance](https://www.enmap.org/news/2026-10-16_2/).
+[DLR scene metadata](https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/ENMAP01-____L2A-DT0000129412_20250511T104201Z_009_V010502_20250515T040235Z) ·
+[Quality codes: product specification section 4.5](https://www.enmap.org/data/doc/EN-PCV-ICD-2009-2_HSI_Product_Specification_Level1_Level2.pdf).

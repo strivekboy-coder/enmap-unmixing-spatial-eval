@@ -21,9 +21,11 @@ quality:
   reject_snow: true
   reject_defective_in_model_bands: true
   require_nominal_testflags: true
+  require_testflags_byte_zero: true
 spectral_alignment:
   method: linear_interpolation_to_existing_177_band_axis
   maximum_source_gap_nm: 35
+  gap_boundary_nearest_max_nm: 5
   no_extrapolation: true
   normalization_or_reference_fitted_correction: false
 spectra:
