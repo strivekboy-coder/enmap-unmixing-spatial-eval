@@ -220,6 +220,20 @@ def historical_purity(root, profile, labels):
                      for index in range(len(labels))])
 
 
+def median_available(array):
+    result = np.full(array.shape[0], np.nan)
+    present = np.isfinite(array).any(axis=1)
+    result[present] = np.nanmedian(array[present], axis=1)
+    return result
+
+
+def plot_supported(ax, wavelength, spectrum, **options):
+    cuts = np.r_[0, np.flatnonzero(np.diff(wavelength) > 35) + 1, len(wavelength)]
+    for start, stop in zip(cuts[:-1], cuts[1:]):
+        ax.plot(wavelength[start:stop], spectrum[start:stop], **options)
+        options.pop('label', None)
+
+
 def spectra_stage(cfg, root, deadline):
     raw, meta, prepared, profile, bounds = load_context(cfg, root)
     with np.load(raw / 'quality_prepared.npz') as source:
@@ -236,7 +250,7 @@ def spectra_stage(cfg, root, deadline):
             library.append((name, level3, np.asarray(obj['y']) / 10000))
     wave = prepared['wavelengths']
     # A spectral roughness proxy is diagnostic, never used to tune or replace the RF.
-    median = np.nanmedian(native[:, native_clear], axis=1)
+    median = median_available(native[:, native_clear])
     rough = np.full(len(native_axis), np.nan)
     for band in range(1, len(native_axis) - 1):
         if max(native_axis[band] - native_axis[band-1], native_axis[band+1] - native_axis[band]) > 35:
@@ -248,7 +262,7 @@ def spectra_stage(cfg, root, deadline):
     pd.DataFrame({'wavelength_nm': native_axis, 'relative_second_difference_proxy': rough,
                   'finite_fraction_on_clear_pixels': finite_share, 'diagnostic_flag': noisy}).to_csv(raw / 'noise_diagnostics.csv', index=False)
     fig, axes = plt.subplots(2, 3, figsize=(15, 8), constrained_layout=True)
-    examples, counts = [], {}
+    examples, counts, signature_diagnostics = [], {}, {}
     colors = ['#555555', '#2d8c4b', '#b78245', '#2279b5']
     red, green, blue = [int(np.argmin(abs(native_axis - value))) for value in (665, 560, 490)]
     native_profile = profile.copy()
@@ -263,9 +277,9 @@ def spectra_stage(cfg, root, deadline):
         ax = axes.flat[index]
         members = [row[2] for row in library if row[1] == label]
         for spectrum in members:
-            ax.plot(wave, spectrum, color='#d0d0d0', lw=.6)
+            plot_supported(ax, wave, spectrum, color='#d0d0d0', lw=.6)
         if len(members):
-            ax.plot(wave, np.median(members, axis=0), color='#555555', ls=':', label='2009 library median')
+            plot_supported(ax, wave, np.median(members, axis=0), color='#555555', ls=':', label='2009 library median')
         if len(candidates):
             # Fixed coordinate-stratified selection, without using prediction errors.
             order = np.linspace(0, len(candidates) - 1, min(cfg['spectra']['pixels_per_class'], len(candidates)), dtype=int)
@@ -281,8 +295,14 @@ def spectra_stage(cfg, root, deadline):
                 x, y = profile['transform'] * (int(column) + .5, int(row) + .5)
                 examples.append({'historical_label_2009': label, 'row': int(row), 'column': int(column), 'x': x, 'y': y})
                 axes[1, 1].plot(column, row, 'o', mfc='none', mec=colors[index], ms=6)
-            ax.plot(native_axis, np.nanmedian(real, axis=1), color=colors[index], lw=1.5, label='2025 native bands; bad values masked')
-            ax.plot(wave, np.median(simulated, axis=1), color='#b44d4d', lw=1, ls='--', label='2009 simulated, same positions')
+            actual_median = median_available(real)
+            plot_supported(ax, native_axis, actual_median, color=colors[index], lw=1.5, label='2025 native bands; bad values masked')
+            plot_supported(ax, wave, np.median(simulated, axis=1), color='#b44d4d', lw=1, ls='--', label='2009 simulated, same positions')
+            r_index, n_index = [int(np.argmin(abs(native_axis-v))) for v in (665,850)]
+            signature_diagnostics[label] = {'red_reflectance': float(actual_median[r_index]),
+                                            'nir_reflectance': float(actual_median[n_index]),
+                                            'ndvi_of_median_spectrum': float((actual_median[n_index]-actual_median[r_index]) /
+                                                (actual_median[n_index]+actual_median[r_index]))}
         else:
             ax.text(.5, .55, 'No QA-clear pixels at >=95%\nhistorical purity; no spectrum invented',
                     ha='center', transform=ax.transAxes, fontsize=9)
@@ -297,15 +317,22 @@ def spectra_stage(cfg, root, deadline):
     axes[1, 1].set(title='2025 RGB, per-band QA; sampled historical labels', xlabel='Column', ylabel='Row')
     quality = json.loads((raw / 'quality_summary.json').read_text(encoding='utf-8'))
     entries = quality['individual_flags_overlap_and_are_not_additive']
-    axes[1, 2].barh(list(entries), [entries[name]['share_of_full_tutorial_grid'] * 100 for name in entries], color='#667d94')
+    names = {'any_quality_test_flag': 'Any quality-test flag', 'defective_in_model_support': 'Defect in any model-support band',
+             'cloud_shadow': 'Cloud shadow', 'cloud':'Cloud', 'cirrus':'Cirrus', 'haze':'Haze', 'snow':'Snow'}
+    percentages = [entries[name]['share_of_full_tutorial_grid'] * 100 for name in entries]
+    bars = axes[1, 2].barh([names[name] for name in entries], percentages, color='#667d94')
+    axes[1, 2].bar_label(bars, labels=[f'{v:.2f}%' for v in percentages], padding=3, fontsize=8)
+    axes[1, 2].set_xlim(0,100)
     axes[1, 2].set(xlabel='% of full tutorial grid (overlapping flags)', title=f'Complete-feature inference support: {usable.mean():.1%}')
-    fig.suptitle('Real EnMAP first look: 2025 vs 2009 — 16-year calendar gap; historical classes are not 2025 truth', fontsize=12)
+    fig.suptitle('Real EnMAP first look: 2025 vs 2009 — 16-year gap; historical classes are not 2025 truth\n'
+                 'Blue: water-vapour windows; orange: roughness/finite-support diagnostic, not measured sensor SNR', fontsize=12)
     figures = root / cfg['figure_directory']; figures.mkdir(parents=True, exist_ok=True)
     fig.savefig(figures / 'spectra_quality.png', dpi=170)
     plt.close(fig)
     pd.DataFrame(examples).to_csv(raw / 'spectrum_example_locations.csv', index=False)
     result = {'time_utc': utc_now(), 'historical_pure_clear_support': counts,
               'example_pixels': examples, 'diagnostic_flagged_source_bands': int(noisy.sum()),
+              'median_spectrum_signature_diagnostics': signature_diagnostics,
               'noise_definition': 'Relative adjacent-band residual >0.1 or <95% finite support; diagnostic, not measured SNR and not an RF exclusion.',
               'class_interpretation': '2009 level_3 polygon labels, >=95% purity, coordinate-stratified samples on atmospheric/testflag-clear support; bad values masked per band. Not independently validated 2025 material labels.',
               'plot_interpretation': '2025 spectrum is measured reflectance at historical positions; no claim that old bare soil or roof remains unchanged.'}

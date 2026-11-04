@@ -14,7 +14,7 @@ Land mode, bilinear, terrain correction, no cirrus/haze removal or band interpol
 
 Atmospheric/testflag-clear nearest-grid share: 86.60%. **Conservative complete-feature inference support: 2,721/88,000 pixels (3.09% of the full tutorial rectangle; 3.06% of valid simulated-image support).** Historical reference overlap: 31 pixels. Reject cloud, cloud shadow, haze, any cirrus, snow, defective source bands and any quality-test flag; every bilinear contributor must pass. Individual flag shares overlap.
 
-Spectrum comparison pending.
+Historical >=95%-pure atmospheric-clear support: roof 11, low vegetation 19, soil 14, water 8. Samples use 2009 roof/low-vegetation/soil/water labels, not independently verified 2025 identities. Water-vapour windows and a fixed spectral-roughness/finite-support proxy are marked; this proxy is not measured sensor SNR.
 
 Frozen RF inference and historical comparison pending.
 
@@ -37,3 +37,5 @@ and two figures are published. Credentials are local and never logged. Deadline:
 
 [DLR scene metadata](https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/ENMAP01-____L2A-DT0000129412_20250511T104201Z_009_V010502_20250515T040235Z) ·
 [Quality codes: product specification section 4.5](https://www.enmap.org/data/doc/EN-PCV-ICD-2009-2_HSI_Product_Specification_Level1_Level2.pdf).
+
+![spectra_quality.png](results/real_data_first_look/spectra_quality.png)
