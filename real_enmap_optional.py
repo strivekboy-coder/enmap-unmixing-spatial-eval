@@ -12,6 +12,37 @@ BANDS = ['blue', 'green', 'red', 'rededge1', 'rededge2', 'rededge3', 'nir', 'nir
 S2_BANDS = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
 
 
+def load_s2_search(cfg, raw, meta, bounds, crs, deadline):
+    """Cache the public +/-3-day search; never require an unpublished cache."""
+    from datetime import datetime, timedelta
+    import requests
+    from rasterio.warp import transform_bounds
+    from real_enmap_io import StopWork, write_json
+    path = raw / 's2_search.json'
+    if not path.exists():
+        deadline.check(60)
+        centre = datetime.fromisoformat(meta['acquisition_times_utc_by_corner']['center'].replace('Z', '+00:00'))
+        days = cfg['optional_cross_mission']['sentinel_date_tolerance_days']
+        start = (centre - timedelta(days=days)).strftime('%Y-%m-%dT00:00:00Z')
+        end = (centre + timedelta(days=days)).strftime('%Y-%m-%dT23:59:59Z')
+        endpoint = cfg['optional_cross_mission']['sentinel_stac_endpoint'].rstrip('/')
+        response = requests.get(endpoint + '/search', params={
+            'collections': 'sentinel-2-l2a',
+            'bbox': ','.join(map(str, transform_bounds(crs, 'EPSG:4326', *bounds))),
+            'datetime': start + '/' + end, 'limit': 100}, timeout=30)
+        response.raise_for_status()
+        result = response.json()
+        # Earth Search may emit a next link even when matched == returned.
+        matched = result.get('context', {}).get('matched', result.get('numberMatched'))
+        complete = isinstance(matched, int) and matched <= len(result.get('features', []))
+        if not complete and any(link.get('rel') == 'next' for link in result.get('links', [])):
+            raise StopWork('S2 search exceeds one page; refine the fixed search rather than silently truncate.')
+        if not any(item['id'] == cfg['optional_cross_mission']['selected_s2_item'] for item in result.get('features', [])):
+            raise StopWork('The fixed S2 product is absent from the date/extent search; no automatic substitution.')
+        write_json(path, result)
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
 def asset_on_grid(asset, target):
     import numpy as np
     import rasterio
@@ -50,7 +81,7 @@ def prepare_s2(cfg, root, deadline):
     if not (raw / 'transfer_summary.json').exists():
         raise StopWork('Optional work requires completed required first-look stages.')
     deadline.check(60)
-    search = json.loads((raw / 's2_search.json').read_text(encoding='utf-8'))
+    search = load_s2_search(cfg, raw, meta, bounds, profile['crs'], deadline)
     item = next(f for f in search['features'] if f['id'] == cfg['optional_cross_mission']['selected_s2_item'])
     to_projected = Transformer.from_crs(4326, profile['crs'], always_xy=True).transform
     coverage = transform(shape(item['geometry']), to_projected, interleaved=False).intersection(box(*bounds)).area / box(*bounds).area
@@ -275,12 +306,14 @@ def run_coreg(cfg, root, deadline):
     raw = root / cfg['raw_directory']
     refresh_geometry_inputs(cfg,root,deadline)
     tools = raw / 'optional_tools'
-    status = json.loads((tools / 'installation_status.json').read_text(encoding='utf-8'))
-    if status['state'] != 'installed':
-        raise StopWork('AROSICS environment was not installed; no substitute algorithm is labelled AROSICS.')
+    settings = cfg['optional_cross_mission']
+    executable = (root / settings['micromamba_executable']).resolve()
+    prefix = (root / settings['arosics_environment']).resolve()
+    if not executable.is_file() or not (prefix / 'conda-meta').is_dir():
+        raise StopWork('Install environment_arosics.yaml and configure its local paths before optional-coreg.')
     environment = os.environ.copy()
     environment['MAMBA_ROOT_PREFIX'] = str(root.parent / '.ar_root')
-    command = [str(tools/'micromamba.exe'), '--no-rc', 'run', '--prefix', str(root.parent/'.ar_env'),
+    command = [str(executable), '--no-rc', 'run', '--prefix', str(prefix),
                'python', str(root/'real_enmap_optional.py'), '--coreg-worker-raw', str(raw)]
     with (raw/'arosics_run.log').open('w',encoding='utf-8') as log:
         process = subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=environment,

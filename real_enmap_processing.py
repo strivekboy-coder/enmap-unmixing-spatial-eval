@@ -455,20 +455,19 @@ def refresh_report(cfg, root, include_cross_mission=True):
     if quality:
         quality_note = (f"Atmospheric/testflag-clear nearest-grid share: {quality['atmospheric_and_testflag_clear_share']:.2%}. "
                         f"**Conservative complete-feature inference support: {quality['conservative_usable_pixels']:,}/{quality['full_tutorial_grid_pixels']:,} pixels "
-                        f"({quality['usable_share_of_full_tutorial_grid']:.2%} of the full tutorial rectangle; "
-                        f"{quality['usable_share_of_tutorial_valid_image']:.2%} of valid simulated-image support).** "
+                        f"({quality['usable_share_of_full_tutorial_grid']:.2%} of the tutorial rectangle).** "
                         f"Historical reference overlap: {quality['usable_reference_pixels']} pixels. "
                         'Reject cloud, cloud shadow, haze, any cirrus, snow, defective source bands and any quality-test flag; '
                         'every bilinear contributor must pass. Individual flag shares overlap.')
     spectrum_note = 'Spectrum comparison pending.'
     if spectra:
         spectrum_note = ('Historical >=95%-pure atmospheric-clear support: ' + ', '.join(f'{k} {v}' for k,v in spectra['historical_pure_clear_support'].items())
-                         + '. Samples use 2009 roof/low-vegetation/soil/water labels, not independently verified 2025 identities. '
-                         'Water-vapour windows and a fixed spectral-roughness/finite-support proxy are marked; this proxy is not measured sensor SNR.')
+                         + '. Labels describe 2009, not independently verified 2025 materials. '
+                         'Water-vapour windows and roughness/finite-support flags (not measured SNR) are marked.')
         spectrum_note += (' The historical soil and water groups have 2025 median-spectrum NDVI '
                           f"{spectra['median_spectrum_signature_diagnostics']['soil']['ndvi_of_median_spectrum']:.2f} and "
                           f"{spectra['median_spectrum_signature_diagnostics']['water']['ndvi_of_median_spectrum']:.2f}; "
-                          'their signatures warn against treating the old labels as current pure materials.')
+                          'so these are not verified contemporary pure endmembers.')
     metric_note = 'Frozen RF inference and historical comparison pending.'
     if transfer:
         lines = ['| Fraction | Real 2025 vs 2009 MAE | Simulated 2009 MAE, same pixels |', '| --- | ---: | ---: |']
@@ -502,12 +501,12 @@ def refresh_report(cfg, root, include_cross_mission=True):
     figure_note = ''
     for name in ('spectra_quality.png', 'transfer_summary.png'):
         if (root / cfg['figure_directory'] / name).exists():
-            figure_note += f'\n![{name}]({cfg["figure_directory"]}/{name})\n'
+            figure_note += f'\n[{name}]({cfg["figure_directory"]}/{name})\n'
     text = f'''# Real EnMAP first look — Berlin, 2025-05-11
 
 **16-year calendar gap:** 2025 real EnMAP versus the 2009 simulated scene/reference.
-These are historical discrepancies, combining model/sensor, geometry, season and
-genuine land-cover change; they do not establish same-date transfer accuracy.
+Historical discrepancies combine model/sensor, geometry, season and genuine
+land-cover change; they do not establish same-date accuracy.
 
 XML confirms centre acquisition **2025-05-11 10:42:03.869622 UTC**, processing-chain
 version **{meta['processing_chain_revision']}**, 224 bands (418.416–2445.3 nm),
@@ -523,25 +522,19 @@ Land mode, bilinear, terrain correction, no cirrus/haze removal or band interpol
 
 {metric_note}
 
-Real spectra are bilinearly aligned to the exact tutorial grid and linearly
-interpolated to its frozen 177-band axis; no extrapolation or gaps >35 nm.
-At a gap boundary, nearest-band mapping is allowed only within half its FWHM and
-5 nm (1783 maps to 1780.22 nm); the gap itself is never bridged.
-This approximates differing spectral responses. No reference-fitted correction,
-normalization, tuning or sum-to-one is applied. All 12 rebuilt EnMAP estimators
-exactly reproduce saved Stage A predictions. The extra S2-like branch is a
-sensitivity: one estimator differs at 2/71,158 replay pixels (maximum 0.009905).
-Ensemble SD is across 3 runs, not calibrated uncertainty; nominal georeferencing
-may contribute to historical differences.
+Alignment: bilinear spatial resampling; linear 177-band interpolation without
+extrapolation/gap bridging. One edge maps 1783 to 1780.22 nm (within half-FWHM/5nm).
+No reference-fitted correction, tuning or sum-to-one. All 12 rebuilt EnMAP models
+reproduce Stage A predictions exactly. S2-like is sensitivity-only: 2/71,158 replay
+pixels differ, maximum 0.009905. Three-member SD is not calibrated uncertainty.
 
 {optional_note}
 
-Raw files, model objects, detailed tables and fraction/uncertainty GeoTIFFs remain
-local under ignored `data/real_enmap/20250511/`. Only code/configuration, this report
-and two figures are published. Credentials are local and never logged. Deadline:
-**2026-11-04 15:30 Europe/Berlin**. Re-run with `python real_enmap.py --stage metadata`,
-`--stage download`, `--stage quality`, `--stage spectra`, `--stage transfer`.
-Optional order: `--stage optional-prepare`, `optional-audit`, `optional-coreg`, `optional-compare`.
+Raw data/models/tables/GeoTIFFs stay in ignored `data/real_enmap/20250511/`;
+credentials never enter Git. Deadline: **2026-11-04 15:30 Europe/Berlin**.
+Re-run Stage A first, then `python real_enmap.py --stage STAGE` in this order:
+metadata/download/prepare-models/quality/spectra/transfer; optional-prepare/optional-audit/optional-coreg/optional-compare.
+Use `real_enmap_config.yaml`; set a new explicit deadline for later reruns.
 
 [DLR scene metadata](https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A/items/{cfg['scene_id']}) ·
 [Quality codes: product specification section 4.5](https://www.enmap.org/data/doc/EN-PCV-ICD-2009-2_HSI_Product_Specification_Level1_Level2.pdf).

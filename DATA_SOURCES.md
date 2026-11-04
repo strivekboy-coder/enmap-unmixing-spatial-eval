@@ -38,3 +38,26 @@ years are recorded in the small provenance JSON/CSV files under `results/`.
 The 2009 tutorial scene, 2018 Sentinel-2 observations and 2021 WorldCover map
 represent different years. Derived Stage B comparisons demonstrate methods;
 they do not establish same-date sensor superiority or verified temporal stability.
+
+
+## Real-data first look (2025)
+
+EnMAP L2A scene `ENMAP01-____L2A-DT0000129412_20250511T104201Z_009_V010502_20250515T040235Z`
+was acquired on 11 May 2025 and retrieved from the [DLR Geoservice STAC](https://geoservice.dlr.de/eoc/ogc/stac/v1/collections/ENMAP_HSI_L2A).
+The original EnMAP product remains local; DLR/EnMAP data terms apply independently
+of the MIT code license. Actual Sentinel-2C L2A `S2C_33UUU_20250512_0_L2A`
+comes from Earth Search / Copernicus, with original ESA XML/JP2 calibration checks.
+Contains modified Copernicus Sentinel data (2025). Convolution uses the official
+ESA Sentinel-2C spectral response functions, version 4.0. The first-look figures
+also derive from the attributed 2009 tutorial inputs above and retain CC BY-SA 4.0.
+
+To reproduce, first run Stage A, then the ordered stages in
+[REAL_DATA_FIRST_LOOK.md](REAL_DATA_FIRST_LOOK.md). Install the optional isolated
+AROSICS environment with `micromamba create -p ../.ar_env -f environment_arosics.yaml`
+([official installation guide](https://danschef.git-pages.gfz-potsdam.de/arosics/doc/installation.html));
+configure `micromamba_executable` and `arosics_environment` in
+`real_enmap_config.yaml`. The public S2 date/extent search is fetched on demand.
+Only EnMAP download requires local `ENMAP_USERNAME` and `ENMAP_PASSWORD` user
+environment variables (IPS main identity); no credentials belong in this repository.
+Detailed input checksums, quality counts, calibration audits and band metrics are
+regenerated under ignored `data/real_enmap/20250511/`, not committed.

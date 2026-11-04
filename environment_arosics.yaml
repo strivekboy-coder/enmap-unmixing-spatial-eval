@@ -1,0 +1,14 @@
+# Separate optional environment: AROSICS/GDAL are not installed into the RF env.
+# Keep the Windows prefix short; configure local paths in real_enmap_config.yaml.
+# micromamba create -p ../.ar_env -f environment_arosics.yaml
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.16
+  - arosics=1.14.0
+  - rasterio=1.5.2
+  - gdal=3.13.3
+  - numpy=2.5.4
+  - scipy=1.18.1
+  - geoarray=0.19.2
+  - py-tools-ds=0.24.1

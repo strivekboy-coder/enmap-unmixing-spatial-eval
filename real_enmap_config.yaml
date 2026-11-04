@@ -37,6 +37,9 @@ spectra:
   diagnostic_minimum_band_finite_fraction: 0.95
 optional_cross_mission:
   enabled_after_required_steps: true
+  sentinel_stac_endpoint: https://earth-search.aws.element84.com/v1
+  micromamba_executable: data/real_enmap/20250511/optional_tools/micromamba.exe
+  arosics_environment: ../.ar_env
   sentinel_date_tolerance_days: 3
   minimum_remaining_minutes: 20
   selected_s2_item: S2C_33UUU_20250512_0_L2A

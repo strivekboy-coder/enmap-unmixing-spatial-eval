@@ -4,7 +4,7 @@
 
 **Main findings:** RF macro MAE falls from 0.1506 to 0.1432: a 0.75 percentage-point gain (paired spatial-block 95% CI 0.41–0.96). Temporal S2 and fixed late fusion show average gains with class-specific trade-offs; fusion worsens water relative to temporal S2. [Stage A sensitivity/diagnosis](results/stage_a_additions/REPORT.md) · [Stage B findings](results/stage_b/RESULTS_SUMMARY.md).
 
-**Limitations:** One Berlin tutorial scene; simulated EnMAP; 1,578 reference pixels in 12 blocks (9 with reporting support); large water bias. Stage B combines 2009/2018/2021 sources and loses all soil-dominated support under the consistency screen. No real EnMAP or official QGIS/EnMAP-Box comparison; this is a Python re-implementation, not a validated reproduction.
+**Limitations:** One Berlin tutorial scene; simulated EnMAP; 1,578 reference pixels in 12 blocks (9 with reporting support); large water bias. Stage B combines 2009/2018/2021 sources and loses all soil-dominated support under the consistency screen. The separate [2025 real-EnMAP first look](REAL_DATA_FIRST_LOOK.md) retains only 3.09% complete-spectrum support and 31 historical reference pixels across a 16-year gap. No official QGIS/EnMAP-Box comparison; this is a Python re-implementation, not a validated reproduction.
 
 [Code: MIT](LICENSE) · [Data attribution and result licenses](DATA_SOURCES.md) · Raw data, GeoTIFFs and caches are excluded; regenerate them locally.
 
@@ -147,7 +147,7 @@ One city, one old scene, simulated EnMAP, a small image-derived library, and spa
 
 The separately reported [Stage A additions](results/stage_a_additions/REPORT.md) provide paired-block gain intervals and block shares, context decomposition, brightness/shadow-proxy water diagnosis with example spectra, and a standardized SVR sensitivity whose parameters were selected only on synthetic mixtures. They preserve the RF baseline. Re-run only these additions with `python run.py --config config.yaml --stage a-additions`.
 
-Stage B uses independent external WorldCover-derived endmembers, compares single-date and temporal S2 features from the same pixels, and averages temporal S2 and simulated EnMAP predictions without training a joint model. It must prominently report the 2009/S2/WorldCover year differences, class crosswalk limitations and fixed data gates. See `results/stage_b/STATUS.md` when that stage has run. The QGIS official comparison and simulated-to-real EnMAP transfer remain pending software/data access; no real L2A results are claimed.
+Stage B uses independent external WorldCover-derived endmembers, compares single-date and temporal S2 features from the same pixels, and averages temporal S2 and simulated EnMAP predictions without training a joint model. It must prominently report the 2009/S2/WorldCover year differences, class crosswalk limitations and fixed data gates. See `results/stage_b/STATUS.md` when that stage has run. The official QGIS comparison remains pending. The separate [real L2A first look](REAL_DATA_FIRST_LOOK.md) applies the frozen RF and compares actual Sentinel-2; its sparse support and 16-year reference gap prevent a contemporary accuracy claim.
 
 Stage B is complete as a **cross-year method demonstration**, using 2009 simulated EnMAP, 2018 real S2 and 2021 WorldCover. Its common-support macro results are below; they use a different mask from the 1,578-pixel Stage A baseline.
 
