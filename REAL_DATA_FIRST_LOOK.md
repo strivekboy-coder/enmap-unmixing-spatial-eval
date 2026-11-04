@@ -14,9 +14,19 @@ Land mode, bilinear, terrain correction, no cirrus/haze removal or band interpol
 
 Atmospheric/testflag-clear nearest-grid share: 86.60%. **Conservative complete-feature inference support: 2,721/88,000 pixels (3.09% of the full tutorial rectangle; 3.06% of valid simulated-image support).** Historical reference overlap: 31 pixels. Reject cloud, cloud shadow, haze, any cirrus, snow, defective source bands and any quality-test flag; every bilinear contributor must pass. Individual flag shares overlap.
 
-Historical >=95%-pure atmospheric-clear support: roof 11, low vegetation 19, soil 14, water 8. Samples use 2009 roof/low-vegetation/soil/water labels, not independently verified 2025 identities. Water-vapour windows and a fixed spectral-roughness/finite-support proxy are marked; this proxy is not measured sensor SNR.
+Historical >=95%-pure atmospheric-clear support: roof 11, low vegetation 19, soil 14, water 8. Samples use 2009 roof/low-vegetation/soil/water labels, not independently verified 2025 identities. Water-vapour windows and a fixed spectral-roughness/finite-support proxy are marked; this proxy is not measured sensor SNR. The historical soil and water groups have 2025 median-spectrum NDVI 0.50 and 0.60; their signatures warn against treating the old labels as current pure materials.
 
-Frozen RF inference and historical comparison pending.
+Frozen 3-member library RF applied to 2,721 real QA-clear pixels. MAE below uses the identical 31 reference pixels for both dates.
+
+| Fraction | Real 2025 vs 2009 MAE | Simulated 2009 MAE, same pixels |
+| --- | ---: | ---: |
+| impervious | 0.1305 | 0.1046 |
+| vegetation | 0.2347 | 0.0946 |
+| soil | 0.1647 | 0.0884 |
+| water | 0.2081 | 0.2114 |
+| macro | 0.1845 | 0.1248 |
+
+Dominant-reference support (impervious/vegetation/soil/water): 17/10/1/3; these 31 spatially sparse pixels cannot establish generalization.
 
 Real spectra are bilinearly aligned to the exact tutorial grid and linearly
 interpolated to its frozen 177-band axis; no extrapolation or gaps >35 nm.
@@ -39,3 +49,5 @@ and two figures are published. Credentials are local and never logged. Deadline:
 [Quality codes: product specification section 4.5](https://www.enmap.org/data/doc/EN-PCV-ICD-2009-2_HSI_Product_Specification_Level1_Level2.pdf).
 
 ![spectra_quality.png](results/real_data_first_look/spectra_quality.png)
+
+![transfer_summary.png](results/real_data_first_look/transfer_summary.png)

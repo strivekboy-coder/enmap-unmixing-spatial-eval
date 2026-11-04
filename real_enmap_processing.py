@@ -390,6 +390,7 @@ def transfer_stage(cfg, root, deadline):
                                'real_minus_simulated_mae': float(np.abs(real-truth).mean() - np.abs(simulated-truth).mean()),
                                'real_bias': float((real - truth).mean()),
                                'real_rmse': float(np.sqrt(((real-truth)**2).mean())),
+                               'reference_positive_pixels': int((truth > 0).sum()) if target is not None else None,
                                'calendar_year_gap': 16})
     metrics = pd.DataFrame(tables)
     metrics.to_csv(raw / 'historical_comparison.csv', index=False)
@@ -399,14 +400,22 @@ def transfer_stage(cfg, root, deadline):
     fig, axes = plt.subplots(3, 4, figsize=(13, 10), constrained_layout=True)
     for target, label in enumerate(bundle['stage_a_config']['classes']):
         for row, image, title, limit in [(0, means['EnMAP'][target], 'EnMAP fractions', (0, 1)),
-                                         (1, spreads['EnMAP'][target], 'Ensemble SD', (0, .15)),
-                                         (2, np.where(common, np.abs(means['EnMAP'][target] - prepared['reference'][target]), np.nan),
-                                          'Difference from 2009 truth', (0, 1))]:
+                                         (1, spreads['EnMAP'][target], 'Ensemble SD', (0, .15))]:
             ax = axes[row, target]
             draw = ax.imshow(image, vmin=limit[0], vmax=limit[1], cmap='viridis' if row != 2 else 'magma')
             ax.set_title(f'{label}: {title}', fontsize=9)
             ax.set_xticks([]); ax.set_yticks([])
             fig.colorbar(draw, ax=ax, shrink=.7)
+        measured = metrics[(metrics.sensor == 'EnMAP') & (metrics['class'] == label)].iloc[0]
+        ax = axes[2, target]
+        bars = ax.bar(['Real 2025', 'Simulated 2009'],
+                      [measured.real_2025_vs_reference_2009_mae, measured.simulated_2009_vs_reference_2009_mae_same_pixels],
+                      color=['#417b9a', '#b8b8b8'])
+        ax.bar_label(bars, fmt='%.3f', fontsize=8, padding=3)
+        ax.set_ylim(0, .4)
+        ax.set_title(f'{label}: historical MAE on same 31 pixels', fontsize=9)
+        ax.set_ylabel('MAE (fraction)')
+        ax.set_xlabel(f'Reference-positive support: {int(measured.reference_positive_pixels)}')
     fig.suptitle(f'Frozen-library RF on real EnMAP 2025 — {common.sum()} common historical pixels; 16-year gap\n'
                  'Maps are local transfer diagnostics; historical differences include real land-cover change', fontsize=12)
     figures = root / cfg['figure_directory']; figures.mkdir(parents=True, exist_ok=True)
@@ -416,6 +425,8 @@ def transfer_stage(cfg, root, deadline):
     outside = (features < library.min(axis=0)) | (features > library.max(axis=0))
     result = {'time_utc': utc_now(), 'usable_inference_pixels': int(usable.sum()),
               'common_historical_reference_pixels': int(common.sum()), 'calendar_year_gap': 16,
+              'historical_dominant_support': {name:int((prepared['reference'][:,common].argmax(axis=0)==i).sum())
+                    for i,name in enumerate(bundle['stage_a_config']['classes'])},
               'feature_entries_outside_library_range_fraction': float(outside.mean()),
               'pixels_with_any_feature_outside_library_range_fraction': float(outside.any(axis=1).mean()),
               'real_reflectance_negative_entry_fraction': float((features < 0).mean()),
@@ -452,6 +463,10 @@ def refresh_report(cfg, root):
         spectrum_note = ('Historical >=95%-pure atmospheric-clear support: ' + ', '.join(f'{k} {v}' for k,v in spectra['historical_pure_clear_support'].items())
                          + '. Samples use 2009 roof/low-vegetation/soil/water labels, not independently verified 2025 identities. '
                          'Water-vapour windows and a fixed spectral-roughness/finite-support proxy are marked; this proxy is not measured sensor SNR.')
+        spectrum_note += (' The historical soil and water groups have 2025 median-spectrum NDVI '
+                          f"{spectra['median_spectrum_signature_diagnostics']['soil']['ndvi_of_median_spectrum']:.2f} and "
+                          f"{spectra['median_spectrum_signature_diagnostics']['water']['ndvi_of_median_spectrum']:.2f}; "
+                          'their signatures warn against treating the old labels as current pure materials.')
     metric_note = 'Frozen RF inference and historical comparison pending.'
     if transfer:
         lines = ['| Fraction | Real 2025 vs 2009 MAE | Simulated 2009 MAE, same pixels |', '| --- | ---: | ---: |']
@@ -461,6 +476,9 @@ def refresh_report(cfg, root):
         metric_note = (f"Frozen 3-member library RF applied to {transfer['usable_inference_pixels']:,} real QA-clear pixels. "
                        f"MAE below uses the identical {transfer['common_historical_reference_pixels']} reference pixels for both dates.\n\n"
                        + '\n'.join(lines))
+        metric_note += ('\n\nDominant-reference support (impervious/vegetation/soil/water): '
+                        + '/'.join(str(transfer['historical_dominant_support'][name]) for name in ['impervious','vegetation','soil','water'])
+                        + '; these 31 spatially sparse pixels cannot establish generalization.')
     figure_note = ''
     for name in ('spectra_quality.png', 'transfer_summary.png'):
         if (root / cfg['figure_directory'] / name).exists():
