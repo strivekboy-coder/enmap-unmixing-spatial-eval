@@ -1,0 +1,39 @@
+scene_id: ENMAP01-____L2A-DT0000129412_20250511T104201Z_009_V010502_20250515T040235Z
+stac_endpoint: https://geoservice.dlr.de/eoc/ogc/stac/v1
+collection: ENMAP_HSI_L2A
+deadline: '2026-11-04T15:30:00+01:00'
+raw_directory: data/real_enmap/20250511
+figure_directory: results/real_data_first_look
+report: REAL_DATA_FIRST_LOOK.md
+stage_a_config: config.yaml
+credentials:
+  username_environment_variable: ENMAP_USERNAME
+  password_environment_variable: ENMAP_PASSWORD
+  # DLR 2026-10-16: Geoservice uses IPS login, not the EOWEB role sub-account.
+  # The user confirmed their Catalogue ID is their IPS login plus this suffix.
+  use_ips_main_account_for_geoservice: true
+# Rules are fixed before inspecting reference errors.
+quality:
+  reject_cloud: true
+  reject_cloud_shadow: true
+  reject_haze: true
+  reject_any_cirrus: true
+  reject_snow: true
+  reject_defective_in_model_bands: true
+  require_nominal_testflags: true
+spectral_alignment:
+  method: linear_interpolation_to_existing_177_band_axis
+  maximum_source_gap_nm: 35
+  no_extrapolation: true
+  normalization_or_reference_fitted_correction: false
+spectra:
+  historical_purity: 0.95
+  pixels_per_class: 5
+  labels: [roof, low vegetation, soil, water]
+  water_vapour_intervals_nm: [[1350, 1450], [1800, 1950]]
+  diagnostic_second_difference_relative_threshold: 0.10
+  diagnostic_minimum_band_finite_fraction: 0.95
+optional_cross_mission:
+  enabled_after_required_steps: true
+  sentinel_date_tolerance_days: 3
+  minimum_remaining_minutes: 20
