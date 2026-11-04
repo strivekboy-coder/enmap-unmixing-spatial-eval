@@ -1,0 +1,89 @@
+data:
+  archive: 'data/tutorial_materials.zip'
+  directory: data
+results: results
+seed: 20261104
+classes: [impervious, vegetation, soil, water]
+spectral:
+  minimum_nm: 420
+  maximum_nm: 2450
+  exclude_intervals_nm: [[1350, 1450], [1800, 1950]]
+  maximum_interpolation_gap_nm: 35
+  minimum_srf_coverage: 0.85
+  srf_file: data/sentinel2_srf.xlsx
+  srf_url: 'https://sentiwiki.copernicus.eu/__attachments/a_ece6183b6698587e7ecd9804974bece3d82e39e151aa5aeca9d8fd95e1f1558c/COPE-GSEG-EOPG-TN-15-0007%20-%20Sentinel-2%20Spectral%20Response%20Functions%202024%20-%204.0.xlsx?cb=05a866b9653a4d2bc442df394ea6cc7a'
+  platform: S2A
+  bands: [B2, B3, B4, B5, B6, B7, B8, B8A, B11, B12]
+  allow_gaussian_fallback: true
+reference:
+  fine_resolution_m: 3
+  minimum_polygon_coverage: 0.95
+  all_touched: false
+  repair_invalid_geometry: true
+  maximum_relative_geometry_area_change: 0.000001
+mixing:
+  mixtures_per_class: 1000
+  complexities: [2, 3, 4]
+  probabilities: [0.4, 0.4, 0.2]
+  background_proportion: 0.0
+  include_original_endmembers: true
+  ensemble_size: 3
+  sensitivity_ensemble_size: 5
+  sum_to_one: false
+forest:
+  n_estimators: 100
+  max_features: 1.0
+  min_samples_leaf: 1
+  n_jobs: 8
+  oob_score: true
+evaluation:
+  block_size_pixels: 33
+  minimum_pixels_per_block: 20
+  priority_quantile: 0.75
+  gradient_edges: [0, 0.25, 0.5, 0.75, 1.000001]
+  plot_sample_pixels: 12000
+  bootstrap_resamples: 2000
+stage_a_additions:
+  enabled: true
+  water_false_prediction_threshold: 0.25
+  water_absence_threshold: 0.01
+  dark_surface_quantile: 0.2
+  diagnostic_input_scale: 10000
+  svr:
+    c_grid: [1, 10, 100]
+    epsilon_grid: [0.01, 0.05]
+    gamma: scale
+    kernel: rbf
+    validation_mixtures_per_class: 400
+    selection_seed_offset: 100000
+    clip_predictions_to_unit_interval: true
+    cache_size_mb: 256
+    prediction_chunk_pixels: 4096
+extension:
+  enabled: true
+  endpoint: https://earth-search.aws.element84.com/v1
+  collection: sentinel-2-l2a
+  candidate_years: [2017, 2018]
+  months: [4, 5, 6, 7, 8, 9, 10]
+  usable_scene_cloud_percent: 20
+  clear_scl_values: [4, 5, 6]
+  chunks_pixels: 256
+  buffer_inner_m: 1000
+  buffer_outer_m: 10000
+  minimum_endmembers_per_class: 30
+  minimum_endmember_purity: 0.95
+  maximum_endmembers_per_class: 250
+  minimum_clear_observations: 5
+  minimum_supported_pixel_share: 0.8
+  usable_clear_area_fraction: 0.8
+  minimum_observed_area_fraction: 0.95
+  dask_workers: 4
+  minimum_worldcover_reference_agreement: 0.7
+  worldcover_year: 2021
+  audited_offset_already_applied_items:
+    - S2B_33UUU_20180514_1_L2A
+    - S2A_33UUU_20180529_1_L2A
+    - S2A_32UQD_20180718_1_L2A
+    - S2A_32UQD_20180807_1_L2A
+    - S2B_33UUU_20180822_1_L2A
+  maximum_same_date_median_DN_difference: 250

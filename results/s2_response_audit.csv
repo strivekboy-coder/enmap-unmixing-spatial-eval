@@ -1,0 +1,11 @@
+band,response_coverage,effective_wavelength_nm,method
+B2,0.989707786749911,493.07325590902474,"ESA SRF v4.0, S2A, linear interpolation and response integration"
+B3,1.0000000000000002,559.8490602412712,"ESA SRF v4.0, S2A, linear interpolation and response integration"
+B4,1.0000000000000002,664.6217578276992,"ESA SRF v4.0, S2A, linear interpolation and response integration"
+B5,1.0000000000000002,704.1149502909975,"ESA SRF v4.0, S2A, linear interpolation and response integration"
+B6,1.0000000000000002,740.4918280704878,"ESA SRF v4.0, S2A, linear interpolation and response integration"
+B7,1.0000000000000002,782.7529046745622,"ESA SRF v4.0, S2A, linear interpolation and response integration"
+B8,1.0,832.7904103946748,"ESA SRF v4.0, S2A, linear interpolation and response integration"
+B8A,1.0,864.7107907127902,"ESA SRF v4.0, S2A, linear interpolation and response integration"
+B11,1.0000000000000004,1613.6805117120307,"ESA SRF v4.0, S2A, linear interpolation and response integration"
+B12,1.000000000000001,2202.3678095428168,"ESA SRF v4.0, S2A, linear interpolation and response integration"

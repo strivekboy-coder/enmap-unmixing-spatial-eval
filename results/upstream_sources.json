@@ -1,0 +1,26 @@
+{
+  "repository": "EnMAP-Box/enmap-box",
+  "retrieved_date": "2026-11-04",
+  "files": [
+    {
+      "name": "classfractionfromcategorizedlayeralgorithm.py",
+      "git_blob_sha": "b74f3d8bad6269bae13f08df8694ca68676a9b24",
+      "url": "https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapboxprocessing/algorithm/classfractionfromcategorizedlayeralgorithm.py"
+    },
+    {
+      "name": "fitrandomforestregressoralgorithm.py",
+      "git_blob_sha": "fc6dfc47564632ce44dc1365df49959a0d2a290a",
+      "url": "https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapboxprocessing/algorithm/fitrandomforestregressoralgorithm.py"
+    },
+    {
+      "name": "prepareregressiondatasetfromsynthmixalgorithm.py",
+      "git_blob_sha": "f9ea7296b358540f575dc09afcc3e5b5b69f6099",
+      "url": "https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapboxprocessing/algorithm/prepareregressiondatasetfromsynthmixalgorithm.py"
+    },
+    {
+      "name": "regressionbasedunmixingalgorithm.py",
+      "git_blob_sha": "3c8a2b7c5a059f846d98e90ea8f398139a4858f6",
+      "url": "https://raw.githubusercontent.com/EnMAP-Box/enmap-box/main/enmapboxprocessing/algorithm/regressionbasedunmixingalgorithm.py"
+    }
+  ]
+}

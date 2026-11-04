@@ -1,0 +1,29 @@
+{
+  "unique_scale_offset": [
+    [
+      9.999999747378752e-05,
+      0.0
+    ]
+  ],
+  "bands": [
+    "blue",
+    "green",
+    "red",
+    "rededge1",
+    "rededge2",
+    "rededge3",
+    "nir",
+    "nir08",
+    "swir16",
+    "swir22"
+  ],
+  "source": "https://github.com/Element84/earth-search/blob/main/docs/collections/sentinel-2-l2a.md#gainoffset-in-items-after-jan-25-2022",
+  "audited_offset_already_applied_items": [
+    "S2B_33UUU_20180514_1_L2A",
+    "S2A_33UUU_20180529_1_L2A",
+    "S2A_32UQD_20180718_1_L2A",
+    "S2A_32UQD_20180807_1_L2A",
+    "S2B_33UUU_20180822_1_L2A"
+  ],
+  "note": "Apply asset scale/offset per date, except five explicitly audited items whose -0.1 metadata would double-apply the already subtracted offset. Same-date red/NIR/SWIR comparisons use no reference labels."
+}

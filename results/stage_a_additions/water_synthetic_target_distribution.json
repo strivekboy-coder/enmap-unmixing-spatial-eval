@@ -1,0 +1,8 @@
+{
+  "n_training_rows": 1075,
+  "zero_water_training_rows": 73,
+  "positive_water_training_share": 0.932093023255814,
+  "mean_synthetic_water_fraction": 0.48683950304985046,
+  "mean_reference_water_fraction_diagnostic_only": 0.023466411978006363,
+  "note": "The target-first positive-mixture prior is prescribed by the tutorial; reference prevalence is used for diagnosis only and never to alter training."
+}

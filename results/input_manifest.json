@@ -1,0 +1,51 @@
+{
+  "files": {
+    "enmap_berlin.tif": {
+      "sha256": "c4dfc8c0a4749b44923b93534be17f1bf59cbb989e2525452be229171282d113",
+      "bytes": 24795286
+    },
+    "library_berlin.gpkg": {
+      "sha256": "f9a0eb1543e3570157021253cb88a8dd78effb49eadd4716c57f98407d497eb6",
+      "bytes": 487424
+    },
+    "landcover_berlin.gpkg": {
+      "sha256": "07cf337e149c3e85da41aabbccb33c22d4295ab3972183f6bcf8ba297f68cad0",
+      "bytes": 4780032
+    }
+  },
+  "image_shape_bands_rows_cols": [
+    177,
+    400,
+    220
+  ],
+  "crs": "EPSG:32633",
+  "transform": [
+    30.0,
+    0.0,
+    380952.37,
+    0.0,
+    -30.0,
+    5820372.35
+  ],
+  "valid_image_pixels": 71158,
+  "library_size": 75,
+  "class_counts": {
+    "impervious": 38,
+    "vegetation": 31,
+    "soil": 4,
+    "water": 2
+  },
+  "exact_wavelength_matches": 75,
+  "bands_retained": 177,
+  "additional_bands_removed": 0,
+  "input_spectral_gaps_nm": [
+    [
+      1323.0,
+      1522.0
+    ],
+    [
+      1783.0,
+      2044.0
+    ]
+  ]
+}

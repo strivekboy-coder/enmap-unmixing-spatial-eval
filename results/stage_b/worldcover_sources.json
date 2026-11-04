@@ -1,0 +1,24 @@
+{
+  "year": 2021,
+  "licence": "CC-BY-4.0",
+  "sources": [
+    {
+      "id": "ESA_WorldCover_10m_2021_v200_N51E012",
+      "stac_asset": "https://ai4edataeuwest.blob.core.windows.net/esa-worldcover/v200/2021/map/ESA_WorldCover_10m_2021_v200_N51E012_Map.tif",
+      "public_esa_asset": "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N51E012_Map.tif"
+    }
+  ],
+  "crosswalk": {
+    "50": 1,
+    "60": 3,
+    "80": 4,
+    "10": 2,
+    "20": 2,
+    "30": 2,
+    "40": 2,
+    "90": 2,
+    "95": 2,
+    "100": 2
+  },
+  "warning": "WorldCover labels are not physical endmember truth and are 12 years later than the 2009 scene."
+}

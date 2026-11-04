@@ -1,0 +1,9 @@
+{
+  "input_display_divisor": 10000,
+  "dark_quantile": 0.2,
+  "dark_VNIR_threshold": 0.08663290739059448,
+  "dark_SWIR_threshold": 0.08044714480638504,
+  "false_water_prediction_threshold": 0.25,
+  "water_absence_threshold": 0.01,
+  "note": "Brightness is the mean of retained channels; darkness is a proxy, not an observed shadow label. No baseline correction."
+}

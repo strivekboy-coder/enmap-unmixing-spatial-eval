@@ -1,0 +1,6 @@
+{
+  "C": 100.0,
+  "epsilon": 0.01,
+  "synthetic_validation_mae": 0.050896595263696075,
+  "selection": "Pooled synthetic validation MAE over four classes and both sensors; no reference access."
+}

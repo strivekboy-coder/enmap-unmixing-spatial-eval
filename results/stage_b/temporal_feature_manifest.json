@@ -1,0 +1,40 @@
+{
+  "selected_year": 2018,
+  "best_date": "2018-05-29",
+  "best_date_external_clear_share": 0.9957716701902748,
+  "feature_names": [
+    "blue_seasonal_median",
+    "green_seasonal_median",
+    "red_seasonal_median",
+    "rededge1_seasonal_median",
+    "rededge2_seasonal_median",
+    "rededge3_seasonal_median",
+    "nir_seasonal_median",
+    "nir08_seasonal_median",
+    "swir16_seasonal_median",
+    "swir22_seasonal_median",
+    "ndvi_median",
+    "ndvi_max",
+    "ndvi_amplitude"
+  ],
+  "single_feature_names": [
+    "blue_best_date",
+    "green_best_date",
+    "red_best_date",
+    "rededge1_best_date",
+    "rededge2_best_date",
+    "rededge3_best_date",
+    "nir_best_date",
+    "nir08_best_date",
+    "swir16_best_date",
+    "swir22_best_date",
+    "ndvi_one_date_median",
+    "ndvi_one_date_max",
+    "ndvi_one_date_amplitude"
+  ],
+  "single_date_schema": "Same 13 features as temporal model; one-date NDVI median=max and amplitude=0.",
+  "n_eval_image_points": 71158,
+  "n_external_candidates": 946,
+  "n_external_common_supported": 931,
+  "n_image_common_supported": 69143
+}

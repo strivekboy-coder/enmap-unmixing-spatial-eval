@@ -1,0 +1,6 @@
+{
+  "year": 2018,
+  "usable_probability": 0.07058823529411765,
+  "expected_attempts": 14.166666666666666,
+  "assumptions": "S2 local SCL cloudiness proxies EnMAP; acquisition attempts are independent with stationary success probability. Revisit, geometry, seasonal persistence and scheduling constraints are ignored."
+}

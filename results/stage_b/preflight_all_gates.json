@@ -1,0 +1,54 @@
+{
+  "worldcover_year": 2021,
+  "reference_pixels": 1578,
+  "worldcover_reference_agreement": 0.8143219264892269,
+  "consistent_pixels": 1285,
+  "inconsistent_pixels": 293,
+  "endmember_counts": [
+    {
+      "class": "impervious",
+      "pure_external_pixels_available": 102258,
+      "sampled_candidates": 250,
+      "worldcover_year": 2021
+    },
+    {
+      "class": "vegetation",
+      "pure_external_pixels_available": 407264,
+      "sampled_candidates": 250,
+      "worldcover_year": 2021
+    },
+    {
+      "class": "soil",
+      "pure_external_pixels_available": 196,
+      "sampled_candidates": 196,
+      "worldcover_year": 2021
+    },
+    {
+      "class": "water",
+      "pure_external_pixels_available": 27641,
+      "sampled_candidates": 250,
+      "worldcover_year": 2021
+    }
+  ],
+  "buffer_inner_m": 1000,
+  "buffer_outer_m": 10000,
+  "selected_s2_year": 2018,
+  "s2_minus_2009_years": 9,
+  "worldcover_minus_s2_years": 3,
+  "clear_observation_stats": {
+    "year": 2018,
+    "products": 240,
+    "days": 85,
+    "median_clear_dates": 32.0,
+    "p10_clear_dates": 8.0,
+    "minimum_clear_dates": 0,
+    "maximum_clear_dates": 47,
+    "supported_share": 0.9742404227212682
+  },
+  "endmembers_after_feature_filter": {
+    "impervious": 239,
+    "vegetation": 250,
+    "soil": 194,
+    "water": 248
+  }
+}

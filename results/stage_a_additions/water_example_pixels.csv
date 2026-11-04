@@ -1,0 +1,4 @@
+selection,row,col,easting,northing,reference_water,predicted_water_enmap,dominant_reference,VNIR_brightness,SWIR_brightness,shadow_like_proxy
+median-brightness pure reference water,45,103,384057.37,5819007.35,1.0,0.9710037112236023,water,0.019431645050644875,0.007600000128149986,True
+largest dark false-water prediction,116,126,384747.37,5816877.35,0.0,0.946814239025116,vegetation,0.019878480583429337,0.010524285957217216,True
+largest bright false-water prediction,277,109,384237.37,5812047.35,0.0,0.4491831958293915,impervious,0.08297974616289139,0.14516857266426086,False

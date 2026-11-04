@@ -1,0 +1,15 @@
+[
+  {
+    "seconds": 2161.110643500011,
+    "status": "technical_failure",
+    "note": "Earlier download/preprocessing attempt, retained before cached retry."
+  },
+  {
+    "seconds": 53.07473719998961,
+    "status": "complete"
+  },
+  {
+    "seconds": 54.589951599991764,
+    "status": "complete"
+  }
+]
